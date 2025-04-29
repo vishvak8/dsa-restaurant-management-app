@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Order Processing</title>
+</head>
+<body>
+    <!-- Navbar for consistent navigation -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/booking">Table Booking</a>
+        <a href="/order">Order Processing</a>
+        <a href="/billing">Billing</a>
+        <a href="/report">End-of-Day Report</a>
+    </div>
+
+    <!-- Main Container for Order Processing Page -->
+    <div class="container">
+        <h1>Order Processing</h1>
+        <p class="info-text">Select a table to place an order:</p>
+        <div class="input-group">
+            <select id="tableSelect" class="styled-select">
+                <option value="-1">Select a Table</option>
+                {% for i in range(5) %}
+                    {% if tables[i] %}
+                        <option value="{{ i }}">Table {{ i + 1 }} - Booked</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <h2>Menu</h2>
+        <div class="menu-grid">
+            {% for item in menu %}
+                <div class="menu-item card">
+                    <p><strong>{{ item.name }}</strong> - ${{ item.price }}</p>
+                    <div class="input-group">
+                        <label for="quantity-{{ item.name }}">Quantity:</label>
+                        <select id="quantity-{{ item.name }}" class="styled-select">
+                            <option value="add">Add</option>
+                            {% for q in range(1, 11) %}
+                                <option value="{{ q }}">{{ q }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn" onclick="placeOrder('{{ item.name }}', {{ item.price }})">Order</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="flex-container">
+            <button class="btn" onclick="window.location.href='/'">Go to Home</button>
+            <button class="btn" onclick="window.location.href='/billing'">Proceed to Billing</button>
+        </div>
+    </div>
+
+    <!-- Custom Alert Box -->
+    <div id="customAlert" class="custom-alert">
+        <span id="alertMessage"></span>
+        <button class="close-alert" onclick="closeAlert()">OK</button>
+    </div>
+
+    <script>
+        function placeOrder(name, price) {
+            const tableId = document.getElementById('tableSelect').value;
+            const quantity = parseInt(document.getElementById(`quantity-${name}`).value) || 1;
+
+            if (tableId === "-1") {
+                showAlert('Please select a table before placing an order.', 'error');
+                return;
+            }
+
+            if (quantity === 'add' || quantity <= 0) {
+                showAlert('Please select a valid quantity.', 'error');
+                return;
+            }
+
+            fetch(`/place_order/${tableId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, price, quantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(data.message, 'success');
+                resetOrderForm(name);
+            })
+            .catch(error => showAlert('Error placing the order.', 'error'));
+        }
+
+        function resetOrderForm(name) {
+            document.getElementById(`quantity-${name}`).value = 'add';
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('customAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.innerText = message;
+            alertBox.className = `custom-alert ${type}`;
+            alertBox.style.display = 'block';
+        }
+
+        function closeAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

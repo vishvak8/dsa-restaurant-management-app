@@ -1,0 +1,228 @@
+/* Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f9f9f9;
+    color: #333;
+    padding-top: 70px; /* For fixed navbar */
+}
+
+/* Navbar Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #61138E;
+    color: white;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 20px;
+    font-weight: bold;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.navbar a:hover {
+    color: #ddd;
+    transform: scale(1.1);
+}
+
+/* Container and Content */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #61138E;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+/* Button Styles */
+button, .btn {
+    background-color: #61138E;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    text-align: center;
+    display: inline-block;
+    z-index: 10;
+    position: relative;
+}
+
+button:hover, .btn:hover {
+    background-color: #9141d8;
+    transform: scale(1.05);
+}
+
+button:disabled {
+    background-color: #ddd;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Input and Select Styles */
+input[type="number"], select {
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 150px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Styled Select */
+.styled-select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    max-width: 200px;
+    margin: 10px auto;
+}
+
+/* Card Styles */
+.card {
+    position: relative;
+    padding: 20px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Flex Layout for Buttons */
+.flex-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.flex-item {
+    margin: 10px;
+}
+
+/* Alert Box Styles */
+.custom-alert {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    min-width: 300px;
+    max-width: 80%;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: center;
+    border-left: 5px solid #61138E; /* Purple border for all alerts */
+}
+
+.custom-alert.success {
+    border-left-color: #61138E; /* Purple for success */
+}
+
+.custom-alert.error {
+    border-left-color: #61138E; /* Purple for error */
+}
+
+.close-alert {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #61138E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.close-alert:hover {
+    background-color: #9141d8;
+    transform: scale(1.05);
+}
+
+/* Styled Links */
+a {
+    color: #61138E;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    margin-top: 20px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Info Text */
+.info-text {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+/* Card for Menu Items */
+.menu-card {
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+    text-align: left;
+}
+
+.menu-card h3 {
+    margin-bottom: 10px;
+    color: #61138E;
+    font-size: 1.5em;
+}
+
+ul, ol {
+    list-style: none;
+    padding-left: 0;
+}
+
+p {
+    font-size: 1em;
+    margin: 10px 0;
+}
+
+strong {
+    font-weight: bold;
+    color: #61138E;
+}

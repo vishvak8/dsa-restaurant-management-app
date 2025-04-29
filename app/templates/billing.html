@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Billing</title>
+</head>
+<body>
+    <!-- Navbar for consistent navigation -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/booking">Table Booking</a>
+        <a href="/order">Order Processing</a>
+        <a href="/billing">Billing</a>
+        <a href="/report">End-of-Day Report</a>
+    </div>
+
+    <!-- Main Container for Billing Page -->
+    <div class="container">
+        <h1>Billing</h1>
+        <p class="info-text">Select a table to view billing:</p>
+        <div class="input-group">
+            <select id="tableSelect" class="styled-select" onchange="fetchBilling()">
+                <option value="-1">Select a Table</option>
+                {% for i in range(5) %}
+                    {% if tables[i] %}
+                        <option value="{{ i }}">Table {{ i + 1 }} - Booked</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Billing details only display when a table is selected -->
+        <div id="billingDetails" class="card" style="display: none;"></div>
+    </div>
+
+    <!-- Custom Alert Box -->
+    <div id="customAlert" class="custom-alert">
+        <span id="alertMessage"></span>
+        <button class="close-alert" onclick="closeAlert()">OK</button>
+    </div>
+
+    <script>
+        let currentTotal = 0;
+        let hasOrders = false;
+
+        function fetchBilling() {
+            const tableId = document.getElementById('tableSelect').value;
+            const billingDetails = document.getElementById('billingDetails');
+
+            if (tableId === "-1") {
+                billingDetails.style.display = 'none';
+                return;
+            }
+
+            fetch(`/billing/${tableId}`)
+                .then(response => {
+                    if (response.ok) return response.json();
+                    return { orders: {}, total: 0 };
+                })
+                .then(data => {
+                    currentTotal = data.total;
+                    hasOrders = Object.keys(data.orders).length > 0;
+
+                    let html = `<h2>Orders</h2>`;
+                    
+                    if (hasOrders) {
+                        html += `<div class="order-item">${Object.keys(data.orders).map(name => {
+                            const item = data.orders[name];
+                            return `<p>${name} - $${item.price} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</p>`;
+                        }).join('')}</div>`;
+
+                        html += `<p><strong>Total:</strong> $${data.total.toFixed(2)}</p>`;
+                        html += `<label for="tip">Add Tip:</label>`;
+                        html += `<input type="number" id="tip" placeholder="Enter tip amount" oninput="updateTotal()"><br>`;
+                        html += `<p id="totalAfterTip"></p>`;
+
+                        html += `
+                            <div class="flex-container">
+                                <button class="btn" onclick="processPayment(${tableId}, 'cash')">Pay with Cash</button>
+                                <button class="btn" onclick="processPayment(${tableId}, 'card')">Pay with Card (+10%)</button>
+                            </div>`;
+                    } else {
+                        html += `<p>No orders available for this table.</p>`;
+                    }
+
+                    billingDetails.innerHTML = html;
+                    billingDetails.style.display = 'block'; // Show billing details when available
+                    updateTotal();
+                })
+                .catch(() => {
+                    // No need to show an alert for no orders
+                    billingDetails.innerHTML = `<h2>Orders</h2><p>No orders available for this table.</p>`;
+                    billingDetails.style.display = 'block';
+                });
+        }
+
+        function updateTotal() {
+            const tip = parseFloat(document.getElementById('tip')?.value) || 0;
+            const totalWithTip = currentTotal + tip;
+            const totalWithCard = totalWithTip * 1.1;
+
+            let html = `<strong>Total after Tip:</strong> $${totalWithTip.toFixed(2)}<br>`;
+            html += `<strong>Total if Paid by Card (10% surcharge):</strong> $${totalWithCard.toFixed(2)}`;
+
+            document.getElementById('totalAfterTip').innerHTML = html;
+        }
+
+        function processPayment(tableId, method) {
+            if (!hasOrders) {
+                showAlert('No orders to process for this table.', 'error');
+                return;
+            }
+
+            const tip = parseFloat(document.getElementById('tip')?.value) || 0;
+            fetch(`/process_payment/${tableId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ method, tip })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(data.message, 'success');
+                resetBillingPage();
+            })
+            .catch(error => showAlert('Error processing payment.', 'error'));
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('customAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.innerText = message;
+            alertBox.className = `custom-alert ${type}`;
+            alertBox.style.display = 'block';
+        }
+
+        function closeAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+
+        function resetBillingPage() {
+            document.getElementById('tableSelect').value = "-1";
+            const billingDetails = document.getElementById('billingDetails');
+            billingDetails.innerHTML = '';
+            billingDetails.style.display = 'none'; // Hide the billing details on reset
+        }
+    </script>
+</body>
+</html>

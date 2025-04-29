@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>End-of-Day Report</title>
+</head>
+<body>
+    <!-- Navbar for consistent navigation -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/booking">Table Booking</a>
+        <a href="/order">Order Processing</a>
+        <a href="/billing">Billing</a>
+        <a href="/report">End-of-Day Report</a>
+    </div>
+
+    <!-- Main Container for End-of-Day Report -->
+    <div class="container card">
+        <h1>End-of-Day Report</h1>
+        <button class="btn" onclick="fetchReport()">Generate Report</button>
+        <div id="reportDetails" class="report-content"></div>
+        <a href="/" class="link">Back to Home</a>
+    </div>
+
+    <script>
+        function fetchReport() {
+            fetch('/report/data')
+                .then(response => response.json())
+                .then(data => {
+                    let html = `
+                        <p><strong>Total Income:</strong> $${data.totalIncome.toFixed(2)}</p>
+                        <p><strong>Highest Spending Table:</strong> Table ${data.highestSpendingTable}</p>
+                        <p><strong>Total Tips Collected:</strong> $${data.totalTips.toFixed(2)}</p>
+                        <h2>Menu Item Popularity</h2>
+                        <div class="card popularity-card">
+                            ${data.sortedItems.map(item => `<p>${item[0]} - ${item[1]} orders</p>`).join('')}
+                        </div>
+                    `;
+                    document.getElementById('reportDetails').innerHTML = html;
+                })
+                .catch(error => {
+                    document.getElementById('reportDetails').innerHTML = '<p>Error fetching report data.</p>';
+                    console.error('Error fetching report data:', error);
+                });
+        }
+    </script>
+</body>
+</html>
